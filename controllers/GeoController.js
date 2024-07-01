@@ -4,8 +4,16 @@ const axios = require("axios");
 async function GeoController(req, res) {
   const visitorName = req.query.visitor_name;
 
-  const clientIp = req.ip || req.headers["x-forwarded-for"];
+  let clientIp = req.headers["cf-connecting-ip"];
 
+  if (!clientIp) {
+    const xForwardedFor = req.headers["x-forwarded-for"];
+    if (xForwardedFor) {
+      clientIp = xForwardedFor.split(",")[0].trim();
+    } else {
+      throw new Error("Client IP not found");
+    }
+  }
   try {
     const geoResponse = await axios.get(`http://ip-api.com/json/${clientIp}`);
 

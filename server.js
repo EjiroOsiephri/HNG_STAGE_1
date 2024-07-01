@@ -5,6 +5,8 @@ const express = require("express");
 const GeoController = require("./controllers/GeoController");
 
 const app = express();
+app.set("trust proxy", true);
+
 const port = process.env.PORT || 3000;
 
 app.get("/api/hello", GeoController);
