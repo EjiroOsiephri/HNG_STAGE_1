@@ -4,7 +4,7 @@ const axios = require("axios");
 async function GeoController(req, res) {
   const visitorName = req.query.visitor_name;
 
-  let clientIp = req.headers["cf-connecting-ip"];
+  let clientIp = req.headers["cf-connecting-ip"] || req.ip;
 
   if (!clientIp) {
     const xForwardedFor = req.headers["x-forwarded-for"];
@@ -15,7 +15,9 @@ async function GeoController(req, res) {
     }
   }
   try {
-    const geoResponse = await axios.get(`http://ip-api.com/json/${clientIp}`);
+    const geoResponse = await axios.get(
+      `https://api.weatherapi.com/v1/ip.json?key=da62c04782ee4945abb14728240107&q=${clientIp}`
+    );
 
     const { city } = geoResponse.data;
 
@@ -37,7 +39,12 @@ async function GeoController(req, res) {
     res.json(response);
   } catch (error) {
     console.error("Error fetching geo data:", error.message);
-    res.status(500).json({ error: "Failed to fetch geo data" });
+    res
+      .status(500)
+      .json({
+        error:
+          "Failed to fetch geo data as a result of you using a reserved ip address",
+      });
   }
 }
 
