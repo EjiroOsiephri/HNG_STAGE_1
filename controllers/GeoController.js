@@ -3,12 +3,15 @@ const axios = require("axios");
 
 async function GeoController(req, res) {
   const visitorName = req.query.visitor_name;
-  const clientIp = ip.address();
+
+  const clientIp = req.ip || req.headers["x-forwarded-for"];
 
   try {
     const geoResponse = await axios.get(`http://ip-api.com/json/${clientIp}`);
 
     const { city } = geoResponse.data;
+
+    console.log(geoResponse);
 
     const location = city || "New York";
     const weatherResponse = await axios.get(
